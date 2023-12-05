@@ -1211,14 +1211,17 @@ func (c *Conn) writeResponse(code int, enhCode EnhancedCode, text ...string) {
 		}
 	}
 
+	var sb strings.Builder
+
 	for i := 0; i < len(text)-1; i++ {
-		c.text.PrintfLine("%d-%v", code, text[i])
+		sb.WriteString(fmt.Sprintf("%d-%v\r\n", code, text[i]))
 	}
 	if enhCode == NoEnhancedCode {
-		c.text.PrintfLine("%d %v", code, text[len(text)-1])
+		sb.WriteString(fmt.Sprintf("%d %v", code, text[len(text)-1]))
 	} else {
-		c.text.PrintfLine("%d %v.%v.%v %v", code, enhCode[0], enhCode[1], enhCode[2], text[len(text)-1])
+		sb.WriteString(fmt.Sprintf("%d %v.%v.%v %v", code, enhCode[0], enhCode[1], enhCode[2], text[len(text)-1]))
 	}
+	c.text.PrintfLine(sb.String())
 }
 
 // Reads a line of input
